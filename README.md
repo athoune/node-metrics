@@ -10,15 +10,15 @@ Try it
 
 In a terminal
 
-  node app.js
+    node app.js
 
 In an other terminnal
 
-  nc "answer 42" | nc localhost 8124
+    nc "answer 42" | nc localhost 8124
 
 In a browser
 
-  http://localhost:1337
+    http://localhost:1337
 
 Todo
 ----
