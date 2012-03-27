@@ -1,11 +1,12 @@
 var http = require('http'),
-    net = require('net');
+    net = require('net'),
+    State = require('./lib/state').State;
 
-var state = {};
+var state = new State();
 
 http.createServer(function (req, res) {
     res.writeHead(200, {'Content-Type': 'application/json'});
-    res.end(JSON.stringify(state));
+    res.end(state.as_json());
 }).listen(1337, '127.0.0.1');
 console.log('Server running at http://127.0.0.1:1337/');
 
@@ -18,7 +19,7 @@ var server = net.createServer(function(c) { //'connection' listener
         var v = match[2];
         var vv = parseInt(v, 10);
         if(! isNaN(vv)) v = vv;
-        state[match[1]] = v;
+        state.set(match[1], v);
     });
 });
 server.listen(8124, function() { //'listening' listener
