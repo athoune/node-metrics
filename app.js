@@ -5,8 +5,21 @@ var http = require('http'),
 var state = new State();
 
 http.createServer(function (req, res) {
-    res.writeHead(200, {'Content-Type': 'application/json'});
-    res.end(state.as_json());
+    if(req.url === "/events") {
+        res.writeHead(200, { 'Content-Type': 'text/event-stream'});
+        var write_event = function(evt) {
+            res.write('data: ');
+            res.write(evt);
+            res.write("\r\n\r\n");
+        };
+        write_event(state.as_json());
+        state.on('set', function(key, value) {
+            write_event(JSON.stringify({key:value}));
+        });
+    } else {
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.end(state.as_json());
+    }
 }).listen(1337, '127.0.0.1');
 console.log('Server running at http://127.0.0.1:1337/');
 
