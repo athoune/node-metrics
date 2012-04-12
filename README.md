@@ -26,6 +26,13 @@ In a browser
 
 First event is a complete dump, following by a simple key/value for each modifications.
 
+Install
+-------
+
+An init.d script is provided
+
+    sudo useradd --system --user-group metricsd
+
 Todo
 ----
 
