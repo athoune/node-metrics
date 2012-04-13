@@ -3,6 +3,12 @@ var http = require('http'),
     State = require('./lib/state').State,
     tcp_socket = require('./lib/input/tcp_socket');
 
+process.title = 'metricsd';
+
+function conf(key, defaultValue) {
+    return process.env[key] | defaultValue;
+};
+
 var state = new State();
 
 http.createServer(function (req, res) {
@@ -21,7 +27,10 @@ http.createServer(function (req, res) {
         res.writeHead(200, {'Content-Type': 'application/json'});
         res.end(state.as_json());
     }
-}).listen(1337, '127.0.0.1');
-console.log('Server running at http://127.0.0.1:1337/');
+}).listen(
+    conf('METRICS_HTTP_PORT', 1337),
+    conf('METRICS_HTTP_HOST', 'localhost'));
 
-tcp_socket.createServer(state, 8124, 'localhost');
+tcp_socket.createServer(state,
+    conf('METRICS_SOCKET_PORT', 8124),
+    conf('METRICS_SOCKET_HOST', 'localhost'));
