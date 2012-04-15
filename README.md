@@ -14,7 +14,7 @@ In a terminal
 
 In an other terminnal
 
-    nc "answer 42" | nc localhost 8124
+    echo "answer 42" | nc localhost 8124
 
 In a browser
 
