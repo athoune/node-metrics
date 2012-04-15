@@ -23,7 +23,9 @@ router.route(/^\/events/, function(req, res) {
     };
     write_event(state.as_json());
     state.on('set', function(key, value) {
-        write_event(JSON.stringify({key:value}));
+        var r = {};
+        r[key] = value;
+        write_event(JSON.stringify(r));
     });
 });
 router.route(/^\/data/, function(req, res) {
