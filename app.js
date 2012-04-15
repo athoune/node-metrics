@@ -1,5 +1,6 @@
 var http = require('http'),
     net = require('net'),
+    fs = require('fs'),
     Router = require('./lib/router').Router,
     State = require('./lib/state').State,
     tcp_socket = require('./lib/input/tcp_socket');
@@ -32,6 +33,32 @@ router.route(/^\/events/, function(req, res) {
 router.route(/^\/data/, function(req, res) {
     res.writeHead(200, {'Content-Type': 'application/json'});
     res.end(state.as_json());
+});
+router.route(/^\/$/, function(req, res) {
+    fs.readFile('./www/index.html', function(err, data) {
+        if (err) throw err;
+        res.writeHead(200, {'Content-Type': 'text/html'});
+        res.end(data);
+    });
+});
+
+var mimetypes = {
+    js: 'application/javascript',
+    css: 'text/css',
+    png: 'image/png'
+};
+
+router.route(/^\/([a-zA-Z0-9\-]+)\.([a-z]{2,3})/, function(req, res, match) {
+    var f = match[1];
+    var ext = match[2];
+    fs.readFile('./www/' + f + '.' + ext, function(err, data) {
+        if (err) {
+            res.writeHead(404);
+        } else {
+            res.writeHead(200, {'Content-Type' : mimetypes[ext]});
+            res.end(data);
+        }
+    });
 });
 server.listen(
     conf('METRICS_HTTP_PORT', 1337),
