@@ -11,6 +11,7 @@ function conf(key, defaultValue) {
 }
 
 var state = new State();
+state.setMaxListeners(200);
 
 var server = http.createServer();
 var router = new Router(server);
