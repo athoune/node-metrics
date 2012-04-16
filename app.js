@@ -17,7 +17,9 @@ state.setMaxListeners(200);
 var server = http.createServer();
 var router = new Router(server);
 router.route(/^\/events/, function(req, res) {
-    res.writeHead(200, { 'Content-Type': 'text/event-stream'});
+    res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+    'X-Accel-Buffering': 'no'});
     var write_event = function(evt) {
         res.write('data: ');
         res.write(evt);
