@@ -3,7 +3,8 @@ var http = require('http'),
     fs = require('fs'),
     Router = require('./lib/router').Router,
     State = require('./lib/state').State,
-    tcp_socket = require('./lib/input/tcp_socket');
+    tcp_socket = require('./lib/input/tcp_socket'),
+    Stats = require('./lib/proc/stats').Stats;
 
 process.title = 'metricsd';
 
@@ -14,6 +15,9 @@ function conf(key, defaultValue) {
 var state = new State();
 state.setMaxListeners(200);
 
+var stats = new Stats(state);
+stats.start();
+
 var server = http.createServer();
 var router = new Router(server);
 router.route(/^\/events/, function(req, res) {
@@ -23,7 +27,7 @@ router.route(/^\/events/, function(req, res) {
     var write_event = function(evt) {
         res.write('data: ');
         res.write(evt);
-        res.write("\r\n\r\n");
+        res.write('\r\n\r\n');
     };
     write_event(state.as_json());
     state.on('set', function(key, value) {
