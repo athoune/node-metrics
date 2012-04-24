@@ -4,7 +4,8 @@ var http = require('http'),
     Router = require('./lib/router').Router,
     State = require('./lib/state').State,
     tcp_socket = require('./lib/input/tcp_socket'),
-    Stats = require('./lib/proc/stats').Stats;
+    Stats = require('./lib/proc/stats').Stats,
+    Vapor = require('./lib/output/vapor.js').Vapor;
 
 process.title = 'metricsd';
 
@@ -20,6 +21,10 @@ stats.start();
 
 var server = http.createServer();
 var router = new Router(server);
+
+var vapor = new Vapor(state, router);
+vapor.start();
+
 router.route(/^\/events/, function(req, res) {
     res.writeHead(200, {
         'Content-Type': 'text/event-stream',
