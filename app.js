@@ -1,11 +1,12 @@
 var http = require('http'),
     net = require('net'),
-    fs = require('fs'),
     Router = require('./lib/router').Router,
     State = require('./lib/state').State,
     tcp_socket = require('./lib/input/tcp_socket'),
     Stats = require('./lib/proc/stats').Stats,
-    Vapor = require('./lib/output/vapor.js').Vapor;
+    Vapor = require('./lib/output/vapor.js').Vapor,
+    statics = require('./lib/statics.js'),
+    state_web = require('./lib/state_web.js');
 
 process.title = 'metricsd';
 
@@ -25,52 +26,10 @@ var router = new Router(server);
 var vapor = new Vapor(state, router);
 vapor.start();
 
-router.route(/^\/events/, function(req, res) {
-    res.writeHead(200, {
-        'Content-Type': 'text/event-stream',
-    'X-Accel-Buffering': 'no'});
-    var write_event = function(evt) {
-        res.write('data: ');
-        res.write(evt);
-        res.write('\r\n\r\n');
-    };
-    write_event(state.as_json());
-    state.on('set', function(key, value) {
-        var r = {};
-        r[key] = value;
-        write_event(JSON.stringify(r));
-    });
-});
-router.route(/^\/data/, function(req, res) {
-    res.writeHead(200, {'Content-Type': 'application/json'});
-    res.end(state.as_json());
-});
-router.route(/^\/$/, function(req, res) {
-    fs.readFile('./www/index.html', function(err, data) {
-        if (err) throw err;
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        res.end(data);
-    });
-});
+state_web.register(router, state);
 
-var mimetypes = {
-    js: 'application/javascript',
-    css: 'text/css',
-    png: 'image/png'
-};
+statics.register(router);
 
-router.route(/^\/([a-zA-Z0-9\-]+)\.([a-z]{2,3})/, function(req, res, match) {
-    var f = match[1];
-    var ext = match[2];
-    fs.readFile('./www/' + f + '.' + ext, function(err, data) {
-        if (err) {
-            res.writeHead(404);
-        } else {
-            res.writeHead(200, {'Content-Type' : mimetypes[ext]});
-            res.end(data);
-        }
-    });
-});
 server.listen(
     conf('METRICS_HTTP_PORT', 1337),
     conf('METRICS_HTTP_HOST', 'localhost'));
