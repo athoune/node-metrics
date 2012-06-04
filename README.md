@@ -1,5 +1,10 @@
+***
+# This project is now [mesures](https://github.com/bearstech/node-mesures)
+***
+
 Metrics
 =======
+
 
 Exposing key/value as a JSON.
 
